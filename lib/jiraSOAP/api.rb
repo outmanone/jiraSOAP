@@ -116,7 +116,7 @@ module JIRA::RemoteAPI
       rescue Handsoap::Fault=>e
         #check if token is invalid or timeout
         if e.reason =~ /RemoteAuthenticationException/
-          puts "login again...."
+          #puts "login again...."
           rs=soap_call_old "login" ,@user,@password
           token=rs.first.content
           if rs !=nil && token !=nil && token.strip.length>0
@@ -143,6 +143,8 @@ module JIRA::RemoteAPI
   end
   #alias_method :saved_filters,      :saved_filters
   
+  #get issues by filter id
+  #it will return Issue_new entity
   def issues_from_filter_with_id_new id, max_results = 500, offset = 0
     array_jira_call JIRA::Issue_new, 'getIssuesFromFilterWithLimit', id, offset, max_results
   end
