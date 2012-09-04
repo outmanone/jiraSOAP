@@ -2,6 +2,8 @@
 # Contains all the metadata for an issue type.
 class JIRA::IssueType < JIRA::IssueProperty
 
+  add_attribute :name,'name',:content
+  
   ##
   # True if the issue type is also a subtask
   #

@@ -2,6 +2,8 @@
 # Contains all the metadata for a priority level.
 class JIRA::Priority < JIRA::IssueProperty
 
+  add_attribute :icon, 'icon', :content
+  
   ##
   # The RGB components as a triple
   #

@@ -95,6 +95,58 @@ module JIRA::RemoteAPI
     response.xpath('node()').map { |frag| type.new_with_xml(frag) }
   end
 
+  #get password
+  alias_method :login_old,:login
+  def login username,password
+    login_old username,password
+    @password=password
+  end
+  
+  alias_method :soap_call_old, :soap_call
+  #auto get token if current session token is invalid
+  def soap_call(method,*args)
+    #puts "hook,method->#{method}"
+    if method.strip =="login" or method.strip == "logout"
+      soap_call_old method,*args
+    else
+      begin
+        #raise Handsoap::Fault.new "dd"," RemoteAuthenticationException ",""  //for test
+        soap_call_old method,*args
+
+      rescue Handsoap::Fault=>e
+        #check if token is invalid or timeout
+        if e.reason =~ /RemoteAuthenticationException/
+          puts "login again...."
+          rs=soap_call_old "login" ,@user,@password
+          token=rs.first.content
+          if rs !=nil && token !=nil && token.strip.length>0
+            #reset token
+            @auth_token=token
+            puts token
+            if args!=nil && args.length>0
+              args[0]=token
+            end
+            soap_call_old method,  *args
+          else
+            raise "Login fail."
+          end
+        else
+          raise e
+        end
+      
+      end
+    end
+  end  
+  #add saved filters (get current user saved filters) 
+  def saved_filters
+    array_jira_call JIRA::Filter, 'getSavedFilters'
+  end
+  #alias_method :saved_filters,      :saved_filters
+  
+  def issues_from_filter_with_id_new id, max_results = 500, offset = 0
+    array_jira_call JIRA::Issue_new, 'getIssuesFromFilterWithLimit', id, offset, max_results
+  end
+  
 end
 
 

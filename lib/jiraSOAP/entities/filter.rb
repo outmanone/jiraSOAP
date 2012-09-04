@@ -6,6 +6,11 @@
 class JIRA::Filter < JIRA::DescribedEntity
 
   # @return [String]
+  add_attribute :id, 'id', :content
+  # @return [String]
+  add_attribute :name, 'name', :content
+  
+  # @return [String]
   add_attribute :author, 'author', :content
 
   # @return [String]
